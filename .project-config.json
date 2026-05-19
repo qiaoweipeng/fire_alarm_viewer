@@ -1,0 +1,35 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [],
+  "dev_command": "pnpm run dev",
+  "env_vars": {},
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663513860071/fCsU5sGTsDSpHanbzSvAdi",
+    "access_key_id": "ASIAZV3A2ECZFJX7CP56",
+    "secret_access_key": "PdpSv6WgWuf6eNume0SMV+MK0DOABcVMh7UQ00gy",
+    "session_token": "IQoJb3JpZ2luX2VjEAkaCXVzLWVhc3QtMSJGMEQCIDBOQqGmsWgpQ1uyKxZrlDdZKLZnhIRmf0ddlKUssPYYAiA1CqWokv1lYL0h9Id0OTPD8HNRak/oYwWC5s/fMG/deCr/AwjS//////////8BEAQaDDY2NTM4NjA5ODg2NiIMV8QMmGqS6gVjTG9rKtMD2M/YlLLlAH04wZaXQIbMBcC5FJSVi7EK6hEv//v199X17SzsC7DjFKtjdBe7MeH3CGH0nPTLaA8su6ksw1Hw5hV1cDLq/pS9Pa8DYNNr1UEboh6r5jftIFR6UhIU2rXeVJ1v406+1eGXvBIgWhqoAiFACQiTRKeK+c0eAvCTTYsKN2T3WBoR7hbLpAkqDSDPUE5doVVHKMKU44wv/PO5PmuRdAuLycNAvdTJy1UqdDuXGJgnX7YW6DaPEkJqAC0wR+8owzTSQydVdDhoddUKbM1AqhBcbXRsUl3SY13ss3TUDiJrJVIF9qbq+nKDszx0D0vy2rg7xStFcDANrfjIGoNJme7EPCqiQEBvW95YhEDOQVXxXR04IVkFz3lmcVH46qP+VOolMKPjNxsQsuOR0PmGds7LZmt/yQP0/nfnW7Kv3c3HTYMV1nULHIaALf/JaldtzeiCMUEkRS79otwq+uB7ajIX8JmYoFtnOQT29GpIGVDnCfHhBTAIL89+E9ZvGRSO/CwK71PCxFjVfdJVzF9Q0zklmgzhiEWj1P5rGLh/MOQxkRCUN6JYLHfuLrteRKB//khnEMeHGEjEIshw8gzf08O54HTEX3DSsFNmjiamNm8w7b6w0AY6ngGe9qLjhc/17ARM3jAhAGK+7ki7dUV24filhi65HsGDHJNHq0sqwE6mbNt9Lc+qHL1WEciSd45wM4lUy47DbrCm1vz61BcUN4oID+FZn/ozw48lgTjIY13B77ylWQHBmabc/gcyY1YgsPmyiSenRMh3Fv7JD76yNGH8AcOIAZXRSbtsgjn49BGm5Pli3nOgyzlh8WlXOtdLATeiafSZwQ==",
+    "expiration": "2026-05-19T20:29:33.000Z"
+  },
+  "name": "fire_alarm_viewer",
+  "path": "/home/ubuntu/fire_alarm_viewer",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "MhxgF73H9nbLfPvE73gTax",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "DyTqbMWDxeHshX3jHgHibW",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "伟鹏 乔",
+    "OWNER_OPEN_ID": "7zQHJAtGuaxaHXdCcy3YSR",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "e6d4abd7-8e74-4622-a9d0-b894ad8cf28d",
+    "VITE_APP_ID": "fCsU5sGTsDSpHanbzSvAdi",
+    "VITE_APP_LOGO": "",
+    "VITE_APP_TITLE": "火灾报警设备交互查看器",
+    "VITE_FRONTEND_FORGE_API_KEY": "ZEsM7y3bUjQ4aHzUZ2yx64",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-static",
+  "test_command": "pnpm test"
+}
