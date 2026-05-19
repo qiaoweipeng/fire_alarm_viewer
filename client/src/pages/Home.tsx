@@ -14,6 +14,7 @@ import { Eye, EyeOff, Search, X, Edit3, Check } from "lucide-react";
  * 1. 显隐切换：通过按钮控制所有设备名称的显示/隐藏
  * 2. 悬停高亮：在隐藏状态下，鼠标悬停在设备上会高亮显示该设备和名称
  * 3. 搜索定位：在搜索框输入完整设备名称，会高亮显示匹配的设备
+ * 4. 编辑模式：直接在图片上框选设备，自动生成坐标数据
  */
 export default function Home() {
   const [namesVisible, setNamesVisible] = useState(true);
@@ -21,6 +22,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Device[]>([]);
   const [editMode, setEditMode] = useState(false);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const {
     selectionBox,
@@ -50,15 +52,16 @@ export default function Home() {
   const isDeviceHighlighted = (deviceId: string): boolean => {
     return (
       hoveredDeviceId === deviceId ||
+      selectedDeviceId === deviceId ||
       searchResults.some((device) => device.id === deviceId)
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       {/* 顶部控制栏 */}
       <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-700 shadow-lg">
-        <div className="container max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-full mx-auto px-4 py-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             {/* 标题 */}
             <div>
@@ -153,105 +156,134 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 图片容器 */}
-      <div className="container max-w-7xl mx-auto px-4 py-8">
-        {editMode && (
-          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <p className="text-sm text-amber-800">
-              <strong>编辑模式已启用：</strong>在图片上拖动鼠标框选设备，松开后坐标数据会打印到控制台。按 F12 打开开发者工具查看详细信息。
-            </p>
-          </div>
-        )}
-        <div
-          ref={containerRef}
-          className={`relative inline-block w-full bg-slate-800 rounded-lg overflow-hidden shadow-2xl border ${
-            editMode ? "border-amber-500" : "border-slate-700"
-          } ${editMode ? "cursor-crosshair" : "cursor-default"}`}
-          onMouseDown={editMode ? handleMouseDown : undefined}
-          onMouseMove={editMode ? handleMouseMove : undefined}
-          onMouseUp={editMode ? handleMouseUp : undefined}
-          onMouseLeave={editMode ? handleMouseUp : undefined}
-        >
-          {/* 背景图片 */}
-          <img
-            src="/manus-storage/fire_alarm_board_154513f2.png"
-            alt="火灾报警控制器展示板"
-            className="w-full h-auto block pointer-events-none"
-            draggable={false}
-          />
+      {/* 主内容区域 - 使用 flex 布局 */}
+      <div className="flex flex-1 gap-4 p-4 overflow-hidden">
+        {/* 左侧设备列表面板 */}
+        <div className="w-72 flex-shrink-0 flex flex-col">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 shadow-lg flex flex-col h-full">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-white font-semibold text-sm">
+                设备列表 ({devices.length})
+              </h3>
+            </div>
 
-          {/* 框选可视化 */}
-          {editMode && <SelectionBox box={selectionBox} />}
+            {/* 设备列表滚动区域 */}
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+              {devices.length === 0 ? (
+                <p className="text-slate-400 text-sm text-center py-8">
+                  暂无设备
+                </p>
+              ) : (
+                devices.map((device) => (
+                  <button
+                    key={device.id}
+                    onClick={() => setSelectedDeviceId(device.id)}
+                    onMouseEnter={() => setHoveredDeviceId(device.id)}
+                    onMouseLeave={() => setHoveredDeviceId(null)}
+                    className={`w-full text-left px-3 py-2 rounded text-sm font-medium transition-all ${
+                      selectedDeviceId === device.id
+                        ? "bg-blue-600 text-white shadow-lg ring-2 ring-blue-400"
+                        : isDeviceHighlighted(device.id)
+                        ? "bg-yellow-500/30 text-yellow-100 border border-yellow-400"
+                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    }`}
+                  >
+                    <div className="truncate font-medium">{device.name}</div>
+                    <div className="text-xs text-slate-400 mt-0.5 truncate">
+                      {device.id}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
 
-          {/* 设备标签层 */}
-          <div className={`absolute inset-0 ${editMode ? "pointer-events-none" : ""}`}>
-            {!editMode &&
-              devices.map((device) => (
-                <DeviceLabel
-                  key={device.id}
-                  device={device}
-                  isVisible={namesVisible}
-                  isHighlighted={isDeviceHighlighted(device.id)}
-                  onHover={setHoveredDeviceId}
-                />
-              ))}
-          </div>
-        </div>
-
-        {/* 说明文本 */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-              <Eye className="w-4 h-4 text-blue-400" />
-              显隐切换
-            </h3>
-            <p className="text-sm text-slate-400">
-              点击顶部按钮切换所有设备名称的显示或隐藏状态
-            </p>
-          </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-              <Search className="w-4 h-4 text-yellow-400" />
-              悬停高亮
-            </h3>
-            <p className="text-sm text-slate-400">
-              在名称隐藏时，将鼠标放在设备上会高亮显示该设备和名称
-            </p>
-          </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-              <Search className="w-4 h-4 text-green-400" />
-              搜索定位
-            </h3>
-            <p className="text-sm text-slate-400">
-              在搜索框输入设备名称，会自动高亮显示匹配的设备
-            </p>
-          </div>
-        </div>
-
-        {/* 设备列表 */}
-        <div className="mt-8 bg-slate-800 border border-slate-700 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">
-            设备列表（共 {devices.length} 个）
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {devices.map((device) => (
-              <div
-                key={device.id}
-                className={`p-3 rounded border transition-all cursor-pointer ${
-                  isDeviceHighlighted(device.id)
-                    ? "bg-yellow-500/20 border-yellow-400 text-yellow-300"
-                    : "bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-500"
-                }`}
-                onMouseEnter={() => setHoveredDeviceId(device.id)}
-                onMouseLeave={() => setHoveredDeviceId(null)}
+            {/* 清除选择按钮 */}
+            {selectedDeviceId && (
+              <button
+                onClick={() => setSelectedDeviceId(null)}
+                className="mt-3 w-full px-3 py-2 text-sm text-slate-300 bg-slate-700 hover:bg-slate-600 rounded transition-colors"
               >
-                <div className="font-medium">{device.name}</div>
-                <div className="text-xs text-slate-500 mt-1">
-                  ID: {device.id}
-                </div>
-              </div>
-            ))}
+                清除选择
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 右侧图片容器 */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {editMode && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800">
+                <strong>编辑模式已启用：</strong>在图片上拖动鼠标框选设备，松开后坐标数据会打印到控制台。按 F12 打开开发者工具查看详细信息。
+              </p>
+            </div>
+          )}
+
+          <div
+            ref={containerRef}
+            className={`relative flex-1 bg-slate-800 rounded-lg overflow-hidden shadow-2xl border flex items-center justify-center ${
+              editMode ? "border-amber-500" : "border-slate-700"
+            } ${editMode ? "cursor-crosshair" : "cursor-default"}`}
+            onMouseDown={editMode ? handleMouseDown : undefined}
+            onMouseMove={editMode ? handleMouseMove : undefined}
+            onMouseUp={editMode ? handleMouseUp : undefined}
+            onMouseLeave={editMode ? handleMouseUp : undefined}
+          >
+            {/* 背景图片 */}
+            <img
+              src="/manus-storage/fire_alarm_board_154513f2.png"
+              alt="火灾报警控制器展示板"
+              className="max-w-full max-h-full object-contain pointer-events-none"
+              draggable={false}
+            />
+
+            {/* 框选可视化 */}
+            {editMode && <SelectionBox box={selectionBox} />}
+
+            {/* 设备标签层 */}
+            <div className={`absolute inset-0 ${editMode ? "pointer-events-none" : ""}`}>
+              {!editMode &&
+                devices.map((device) => (
+                  <DeviceLabel
+                    key={device.id}
+                    device={device}
+                    isVisible={namesVisible}
+                    isHighlighted={isDeviceHighlighted(device.id)}
+                    onHover={setHoveredDeviceId}
+                  />
+                ))}
+            </div>
+          </div>
+
+          {/* 说明文本 */}
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="bg-slate-800 border border-slate-700 rounded p-3">
+              <h3 className="text-white font-semibold mb-1 flex items-center gap-2 text-xs">
+                <Eye className="w-3 h-3 text-blue-400" />
+                显隐切换
+              </h3>
+              <p className="text-xs text-slate-400">
+                点击按钮切换名称显示
+              </p>
+            </div>
+            <div className="bg-slate-800 border border-slate-700 rounded p-3">
+              <h3 className="text-white font-semibold mb-1 flex items-center gap-2 text-xs">
+                <Search className="w-3 h-3 text-yellow-400" />
+                悬停高亮
+              </h3>
+              <p className="text-xs text-slate-400">
+                鼠标放在设备上高亮
+              </p>
+            </div>
+            <div className="bg-slate-800 border border-slate-700 rounded p-3">
+              <h3 className="text-white font-semibold mb-1 flex items-center gap-2 text-xs">
+                <Search className="w-3 h-3 text-green-400" />
+                搜索定位
+              </h3>
+              <p className="text-xs text-slate-400">
+                搜索框快速查找设备
+              </p>
+            </div>
           </div>
         </div>
       </div>
