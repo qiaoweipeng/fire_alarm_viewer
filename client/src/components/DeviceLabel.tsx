@@ -6,6 +6,7 @@ interface DeviceLabelProps {
   isVisible: boolean;
   isHighlighted: boolean;
   onHover: (id: string | null) => void;
+  onClick?: () => void;
 }
 
 /**
@@ -17,10 +18,11 @@ export function DeviceLabel({
   isVisible,
   isHighlighted,
   onHover,
+  onClick,
 }: DeviceLabelProps) {
   return (
     <div
-      className="absolute pointer-events-auto"
+      className="absolute pointer-events-auto cursor-pointer"
       style={{
         left: `${device.x}px`,
         top: `${device.y}px`,
@@ -29,6 +31,7 @@ export function DeviceLabel({
       }}
       onMouseEnter={() => onHover(device.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={onClick}
     >
       {/* 高亮框 */}
       <div

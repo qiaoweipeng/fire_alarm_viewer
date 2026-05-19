@@ -31,6 +31,15 @@ export interface Device {
 }
 
 export const devices: Device[] = [
+  // 用户添加的真实设备
+  {
+    id: "device_1779180495250",
+    name: "送风机",
+    x: 53,
+    y: 96,
+    width: 68,
+    height: 59,
+  },
   // 示例设备 - 请根据实际图片中的设备位置修改或添加
   {
     id: "device_1",
