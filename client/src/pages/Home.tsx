@@ -82,15 +82,15 @@ export default function Home() {
   // 判断设备是否应该高亮
   const isDeviceHighlighted = (deviceId: string): boolean => {
     // 搜索结果只在搜索框有内容时高亮
-    const isSearchHighlighted = searchQuery && searchResults.some((device) => device.id === deviceId);
+    const isSearchHighlighted = !!searchQuery && searchResults.some((device) => device.id === deviceId);
     
     // 如果搜索结果多于1个，不进行联动高亮
-    const shouldSearchHighlight = searchQuery && searchResults.length === 1 && isSearchHighlighted;
+    const shouldSearchHighlight = !!searchQuery && searchResults.length === 1 && isSearchHighlighted;
     
     return (
       hoveredDeviceId === deviceId ||
       selectedDeviceIdFromImage === deviceId ||
-      shouldSearchHighlight
+      !!shouldSearchHighlight
     );
   };
 
@@ -99,7 +99,7 @@ export default function Home() {
     return (
       hoveredDeviceId === deviceId ||
       selectedDeviceIdFromImage === deviceId ||
-      (searchQuery && searchResults.length === 1 && searchResults.some((d) => d.id === deviceId))
+      (!!searchQuery && searchResults.length === 1 && searchResults.some((d) => d.id === deviceId))
     );
   };
 
@@ -107,12 +107,12 @@ export default function Home() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {
-        setIsFullscreen(true);
+        // 忽略错误
       });
       setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {
-        setIsFullscreen(false);
+        // 忽略错误
       });
       setIsFullscreen(false);
     }
