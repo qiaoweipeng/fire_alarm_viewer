@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeviceLabel } from "@/components/DeviceLabel";
+import { SelectionBox } from "@/components/SelectionBox";
 import { devices, searchDevices, Device } from "@/lib/devices";
-import { Eye, EyeOff, Search, X } from "lucide-react";
+import { useDeviceSelector } from "@/hooks/useDeviceSelector";
+import { Eye, EyeOff, Search, X, Edit3, Check } from "lucide-react";
 
 /**
  * 火灾报警设备交互查看器
@@ -18,7 +20,15 @@ export default function Home() {
   const [hoveredDeviceId, setHoveredDeviceId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Device[]>([]);
+  const [editMode, setEditMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const {
+    selectionBox,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    clearSelection,
+  } = useDeviceSelector(containerRef);
 
   // 处理搜索
   useEffect(() => {
@@ -79,6 +89,28 @@ export default function Home() {
                   </>
                 )}
               </Button>
+              <Button
+                onClick={() => {
+                  setEditMode(!editMode);
+                  if (!editMode) {
+                    clearSelection();
+                  }
+                }}
+                variant={editMode ? "default" : "outline"}
+                className="gap-2 bg-amber-600 hover:bg-amber-700 border-amber-600"
+              >
+                {editMode ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    退出编辑
+                  </>
+                ) : (
+                  <>
+                    <Edit3 className="w-4 h-4" />
+                    编辑模式
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
@@ -123,28 +155,46 @@ export default function Home() {
 
       {/* 图片容器 */}
       <div className="container max-w-7xl mx-auto px-4 py-8">
+        {editMode && (
+          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800">
+              <strong>编辑模式已启用：</strong>在图片上拖动鼠标框选设备，松开后坐标数据会打印到控制台。按 F12 打开开发者工具查看详细信息。
+            </p>
+          </div>
+        )}
         <div
           ref={containerRef}
-          className="relative inline-block w-full bg-slate-800 rounded-lg overflow-hidden shadow-2xl border border-slate-700"
+          className={`relative inline-block w-full bg-slate-800 rounded-lg overflow-hidden shadow-2xl border ${
+            editMode ? "border-amber-500" : "border-slate-700"
+          } ${editMode ? "cursor-crosshair" : "cursor-default"}`}
+          onMouseDown={editMode ? handleMouseDown : undefined}
+          onMouseMove={editMode ? handleMouseMove : undefined}
+          onMouseUp={editMode ? handleMouseUp : undefined}
+          onMouseLeave={editMode ? handleMouseUp : undefined}
         >
           {/* 背景图片 */}
           <img
             src="/manus-storage/fire_alarm_board_154513f2.png"
             alt="火灾报警控制器展示板"
-            className="w-full h-auto block"
+            className="w-full h-auto block pointer-events-none"
+            draggable={false}
           />
 
+          {/* 框选可视化 */}
+          {editMode && <SelectionBox box={selectionBox} />}
+
           {/* 设备标签层 */}
-          <div className="absolute inset-0 pointer-events-none">
-            {devices.map((device) => (
-              <DeviceLabel
-                key={device.id}
-                device={device}
-                isVisible={namesVisible}
-                isHighlighted={isDeviceHighlighted(device.id)}
-                onHover={setHoveredDeviceId}
-              />
-            ))}
+          <div className={`absolute inset-0 ${editMode ? "pointer-events-none" : ""}`}>
+            {!editMode &&
+              devices.map((device) => (
+                <DeviceLabel
+                  key={device.id}
+                  device={device}
+                  isVisible={namesVisible}
+                  isHighlighted={isDeviceHighlighted(device.id)}
+                  onHover={setHoveredDeviceId}
+                />
+              ))}
           </div>
         </div>
 
