@@ -1,141 +1,153 @@
-# Web App Template (Static Frontend)
+# Web App 模板 (静态前端)
 
-Pure React 19 + Tailwind 4 template with shadcn/ui baked in. **Use this README as the checklist for shipping static experiences.**
+纯 React 19 + Tailwind 4 模板，内置 shadcn/ui。**请将此 README 作为发布静态体验的检查清单。**
 
-> **Note:** This template includes a minimal `shared/` and `server/` directory with placeholder types to support imported templates. These are just compatibility placeholders - web-static remains a true static-only template without API functionality.
+> **注意：** 此模板包含一个最小化的 `shared/` 和 `server/` 目录，其中包含占位符类型以支持导入的模板。这些仅是兼容性占位符 - web-static 仍然是一个真正的纯静态模板，没有 API 功能。
 
 ---
 
-## Stack Overview
-- Client-only routing powered by React + Wouter.
-- Design tokens live entirely in `client/src/index.css`—keep that file intact.
+## 技术栈概览
 
-## File Structure
+- 客户端路由由 React + Wouter 驱动。
+- 设计令牌（Design tokens）完全位于 [client/src/index.css](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/index.css) 中——请保持该文件完整。
+
+## 文件结构
 
 ```
 client/
-  public/       ← Small configuration files ONLY (favicon.ico, robots.txt). DO NOT put images/media here.
+  public/       ← 仅存放小型配置文件 (favicon.ico, robots.txt)。不要在此处放置图片/媒体文件。
   src/
-    pages/      ← Page-level components
-    components/ ← Reusable UI & shadcn/ui
-    contexts/   ← React contexts
-    hooks/      ← Custom React hooks
-    lib/        ← Utility helpers
-    App.tsx     ← Routes & top-level layout
-    main.tsx    ← React entry point
-    index.css   ← global style
-server/         ← Placeholder for imported template compatibility
-shared/         ← Placeholder for imported template compatibility
-  const.ts      ← Shared constants
+    pages/      ← 页面级组件
+    components/ ← 可复用的 UI 组件 & shadcn/ui
+    contexts/   ← React 上下文
+    hooks/      ← 自定义 React Hooks
+    lib/        ← 工具函数
+    App.tsx     ← 路由与顶层布局
+    main.tsx    ← React 入口点
+    index.css   ← 全局样式
+server/         ← 导入模板兼容性的占位符
+shared/         ← 导入模板兼容性的占位符
+  const.ts      ← 共享常量
 ```
 
-### ⚠️ Handling Images & Media
+### ⚠️ 图片与媒体处理
 
-**DO NOT** store images, videos, or large assets in `client/public/` or `client/src/assets/`. Local media files will cause deployment timeouts.
+**不要** 将图片、视频或大型资源存储在 `client/public/` 或 `client/src/assets/` 中。本地媒体文件会导致部署超时。
 
-**Required workflow:**
-1. Upload assets using the CLI: `manus-upload-file --webdev path/to/image.png`
-2. Use the returned storage path directly in your code: `<img src="/manus-storage/image_a1b2c3d4.png" />`
-3. Store the original local file in `/home/ubuntu/webdev-static-assets/` (outside the project directory)
+**必要的工作流程：**
 
-Only small configuration files like `favicon.ico`, `robots.txt`, and `manifest.json` belong in `client/public/`.
+1. 使用 CLI 上传资源：`manus-upload-file --webdev path/to/image.png`
+2. 直接在代码中使用返回的存储路径：`<img src="/manus-storage/image_a1b2c3d4.png" />`
+3. 将原始本地文件存储在 `/home/ubuntu/webdev-static-assets/`（项目目录之外）
 
-Files in `client/public` are available at the root of your site—reference them with absolute paths (`/robots.txt`, etc.) from HTML templates, JSX, or meta tags.
+只有像 `favicon.ico`、`robots.txt` 和 `manifest.json` 这样的小型配置文件才应放在 `client/public/` 中。
 
----
-
-## 🎯 Development Workflow
-
-1. **Choose a design style** before you write any frontend code according to Design Guide (color, font, shadow, art style). Tell user what you chose. Remember to edit `client/src/index.css` for global theming and add needed font using google font cdn in `client/index.html`.
-2. **Compose pages** in `client/src/pages/`. Keep sections modular so they can be reused across routes.
-3. **Share primitives** via `client/src/components/`—extend shadcn/ui when needed instead of duplicating markup.
-4. **Keep styling consistent** by relying on existing Tailwind tokens (spacing, colors, typography).
-5. **Fetch external data** with `useEffect` if the site needs dynamic content from public APIs.
----
-
-## 🎨 Frontend Development Guidelines
-
-**UI & Styling:**
-- Prefer shadcn/ui components for interactions to keep a modern, consistent look; import from `@/components/ui/*` (e.g., `button`, `card`, `dialog`).
-- Compose Tailwind utilities with component variants for layout and states; avoid excessive custom CSS. Use built-in `variant`, `size`, etc. where available.
-- Preserve design tokens: keep the `@layer base` rules in `client/src/index.css`. Utilities like `border-border` and `font-sans` depend on them.
-- Consistent design language: use spacing, radius, shadows, and typography via tokens. Extract shared UI into `components/` for reuse instead of copy‑paste.
-- Accessibility and responsiveness: keep visible focus rings and ensure keyboard reachability; design mobile‑first with thoughtful breakpoints.
-- Theming: Choose dark/light theme to start with for ThemeProvider according to your design style (dark or light bg), then manage colors pallette with CSS variables in `client/src/index.css` instead of hard‑coding to keep global consistency.
-- Micro‑interactions and empty states: add motion, empty states, and icons tastefully to improve quality without distracting from content.
-- Navigation: For internal tools/admin panels, use persistent sidebar. For public-facing apps, design navigation based on content structure (top nav, side nav, or contextual)—ensure clear escape routes from all pages.
-- Placeholder UI elements: When adding structural placeholders (nav items, CTAs) for not-yet-implemented features, show toast on click ("Feature coming soon"). Inform user which elements are placeholders when presenting work.
-
-**React Best Practices:**
-- Never call setState/navigation in render phase → wrap in `useEffect`
-
-**Customized Defaults:**
-This template customizes some Tailwind/shadcn defaults for simplified usage:
-- `.container` is customized to auto-center and add responsive padding (see `index.css`). Use directly without `mx-auto`/`px-*`. For custom widths, use `max-w-*` with `mx-auto px-4`.
-- `.flex` is customized to have `min-width:0` and `min-height:0` by default
-- `button` variant `outline` uses transparent background (not `bg-background`). Add bg color class manually if needed.
+`client/public` 中的文件在站点根目录下可用——从 HTML 模板、JSX 或 meta 标签中使用绝对路径（如 `/robots.txt` 等引用它们）。
 
 ---
 
-## 🎨 Design Guide
+## 🎯 开发工作流
 
-When generating frontend UI, avoid generic patterns that lack visual distinction:
-- Avoid generic full-page centered layouts—prefer asymmetric/sidebar/grid structures for landing pages and dashboards
-- When user provides vague requirements, make creative design decisions (choose specific color palette, typography, layout approach)
-- Prioritize visual diversity: combine different design systems (e.g., one color scheme + different typography + another layout principle)
-- For landing pages: prefer asymmetric layouts, specific color values (not just "blue"), and textured backgrounds over flat colors
-- For dashboards: use defined spacing systems, soft shadows over borders, and accent colors for hierarchy
-
----
-
-## Animation Guide
-
-Bake motion taste in from the first line of code. Snappy, physically intuitive interactions are not a polish pass — they are part of the initial build.
-- Decide whether to animate at all: keyboard-initiated actions (command palettes, shortcuts) must be instant — never animate them. High-frequency interactions (hover, list nav) should be minimal. Reserve richer motion for occasional events (modals, drawers, toasts) and rare delight moments (onboarding).
-- Keep UI animations under 300ms. A 180ms dropdown feels significantly better than a 400ms one. Typical ranges: button press 100–160ms, tooltips 125–200ms, dropdowns 150–250ms, modals/drawers 200–500ms.
-- Use strong custom easings, not the weak CSS defaults. Default to a snappy ease-out for entering/exiting UI: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1);`. For moving/morphing use `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);`. NEVER use `ease-in` for UI animations — it feels sluggish.
-- Buttons must feel responsive: add `transform: scale(0.97)` on `:active` with a ~160ms ease-out transition so the UI confirms it heard the user.
-- Never animate from `scale(0)` — nothing in the real world appears from nothing. Start from `scale(0.95)` combined with `opacity: 0`.
-- Origin-aware popovers/dropdowns: scale in from the trigger point (e.g. `transform-origin: var(--radix-popover-content-transform-origin)`). Modals are the exception and stay centered.
-- Prefer CSS transitions over @keyframes for dynamic UI state. Transitions can be interrupted and reversed smoothly mid-flight; keyframes restart from zero and feel broken when interrupted.
-- Only animate `transform` and `opacity` for motion — they run on the GPU and skip layout/paint. Avoid animating `width`, `height`, `padding`, `margin`, `top/left` unless absolutely necessary.
-- Stagger grouped entrances by 30–80ms per item to create a cascading reveal instead of a wall of motion.
-- Asymmetric timing for deliberate actions: hold-to-confirm should be slow and linear on press (e.g. 2s linear), but release/cancel should snap back fast (~200ms ease-out).
-- Respect `prefers-reduced-motion`: gate non-essential motion behind `@media (prefers-reduced-motion: no-preference)`.
+1. **在编写任何前端代码之前，根据设计指南选择一种设计风格**（颜色、字体、阴影、艺术风格）。告诉用户你选择了什么。记得编辑 `client/src/index.css以进行全局主题设置，并在 `client/index.html` 中使用 Google Font CDN 添加所需字体。
+2. **在 `client/src/pages/` 中组合页面**。保持模块化的部分以便在不同路由间复用。
+3. **通过 `client/src/components/` 共享基础组件**——需要时扩展 shadcn/ui 而不是复制标记。
+4. **依靠现有的 Tailwind 令牌**（间距、颜色、排版）来保持样式一致。
+5. **如果网站需要从公共 API 获取动态内容，使用 `useEffect` 获取外部数据**。
 
 ---
 
-## Pre-built Components
+## 🎨 前端开发指南
 
-Before implementing UI features, check if these components already exist:
+**UI 与样式：**
 
-Maps:
-- `client/src/components/Map.tsx` - Google Maps integration with proxy authentication. Provides MapView component with onMapReady callback for initializing Google Maps services (Places, Geocoder, Directions, Drawing, etc.). All map functionality works directly in the browser.
+- 优先使用 shadcn/ui 组件进行交互，以保持现代、统一的外观；从 `@/components/ui/*` 导入（例如 `button`, `card`, `dialog`）。
+- 使用组件变体组合 Tailwind 实用类进行布局和状态管理；避免过多的自定义 CSS。在可用时使用内置的 `variant`, `size` 等。
+- 保留设计令牌：保持 [client/src/index.css](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/index.css) 中的 `@layer base` 规则。`border-border` 和 `font-sans` 等工具类依赖于它们。
+- 一致的设计语言：通过令牌使用间距、圆角、阴影和排版。将共享 UI 提取到 `components/` 中以供复用，而不是复制粘贴。
+- 可访问性和响应式：保持可见的焦点环并确保键盘可达性；以移动优先的方式设计，并 thoughtful 地考虑断点。
+- 主题化：根据你的设计风格（深色或浅色背景为 ThemeProvider 选择初始深色/浅色主题），然后在 [client/src/index.css](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/index.css) 中使用 CSS 变量管理调色板，以保持全局一致性，而不是硬编码。
+- 微交互和空状态： tastefully 地添加动效、空状态和图标以提高质量，同时不分散对内容的注意力。
+- 导航：对于内部工具/管理面板，使用持久侧边栏。对于面向公众的应用，根据内容结构设计导航（顶部导航、侧边导航或上下文导航）——确保从所有页面都有清晰的退出路径。
+- 占位符 UI 元素：当为尚未实现的功能添加结构占位符（导航项、CTA）时，点击显示 toast ("功能即将推出")。在展示工作时告知用户哪些元素是占位符。
 
-When implementing features that match these categories, MUST evaluate the component first to decide whether to use or customize it.
+**React 最佳实践：**
+
+- 永远不要在渲染阶段调用 setState/导航 → 将其包裹在 `useEffect` 中
+
+**自定义默认值：**
+此模板简化了一些 Tailwind/shadcn 默认值以简化使用：
+
+- `.container` 被定制为自动居中并添加响应式内边距（参见 [index.css](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/index.css)）。直接使用无需 `mx-auto`/`px-*`。对于自定义宽度，使用带有 `mx-auto px-4` 的 `max-w-*`。
+- `.flex` 默认具有 `min-width:0` 和 `min-height:0
+- `button` 变体 `outline使用透明背景（不是 `bg-background`）。如果需要，手动添加背景色类。
 
 ---
 
-## 🗺️ Maps Integration
+## 🎨 设计指南
 
-**CRITICAL: The Manus proxy provides FULL access to ALL Google Maps features** - including advanced drawing, heatmaps, Street View, all layers, Places API, etc. Do NOT ask users for Google Map API keys - authentication is automatic.
+在生成前端 UI 时，避免缺乏视觉区分度的通用模式：
 
-**Implementation:**
-- Frontend: Import MapView from `client/src/components/Map.tsx` and initialize ANY Google Maps service (geocoding, directions, places, drawing, visualization, geometry, etc.) in the onMapReady callback. ALL Google Maps JavaScript API features work directly in the browser.
-
-NEVER use external map libraries or request API keys from users - the Manus proxy handles everything automatically with no feature limitations.
-
----
-
-## ✅ Launch Checklist
-- [ ] UI layout and navigation structure correct, all image src valid.
-- [ ] Success + error paths verified in the browser
+- 避免通用的全页居中布局——对于落地页和仪表盘，首选非对称/侧边栏/网格结构
+- 当用户提供模糊需求时，做出创造性的设计决策（选择特定的调色板、排版、布局方法）
+- 优先考虑视觉多样性：结合不同的设计系统（例如，一种配色方案 + 不同的排版 + 另一种布局原则）
+- 对于落地页：首选非对称布局、具体的颜色值（不仅仅是“蓝色”）以及有纹理的背景而非平面颜色
+- 对于仪表盘：使用定义的间距系统、柔和阴影优于边框，并使用强调色建立层级
 
 ---
 
-## Core File References
+## 动画指南
 
-`package.json`
+从第一行代码开始就融入运动美感。灵敏且符合物理直觉的交互不是后期打磨——它们是初始构建的一部分。
+
+- 决定是否要动画：键盘触发的操作（命令面板、快捷键）必须是即时的——永远不要对它们进行动画处理。高频交互（悬停、列表导航）应保持极简。将更丰富的动效保留给偶尔发生的事件（模态框、抽屉、toast）和罕见的愉悦时刻（引导流程）。
+- 保持 UI 动画在 300ms 以下。180ms 的下拉菜单感觉明显比 400ms 的好。典型范围：按钮按下 100–160ms，工具提示 125–200ms，下拉菜单 150–250ms，模态框/抽屉 200–500ms。
+- 使用强烈的自定义缓动函数，而不是弱的 CSS 默认值。进入/退出 UI 时默认使用灵敏的 ease-out：`--ease-out: cubic-bezier(0.23, 1, 0.32, 1);`。对于移动/变形使用 `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);`。永远不要对 UI 动画使用 `ease-in` ——它感觉迟缓。
+- 按钮必须感觉响应迅速：在 `:active` 上添加 `transform: scale(0.97)` 并配合 ~160ms 的 ease-out 过渡，以便 UI 确认已听到用户操作。
+- 永远不要从 `scale(0)` 开始动画——现实世界中没有任何东西是从无中生有的。从 `scale(0.95)` 结合 `opacity: 0` 开始。
+- 原点感知的弹出层/下拉菜单：从触发点缩放进入（例如 `transform-origin: var(--radix-popover-content-transform-origin)`）。模态框是例外，保持居中。
+- 对于动态 UI 状态，优先使用 CSS transitions 而非 @keyframes。Transitions 可以平滑地中断和反转中途飞行；keyframes 会从零重新开始，当中断时感觉断裂。
+- 仅对 `transform` 和 `opacity` 进行动效处理——它们在 GPU 上运行并跳过布局/绘制。除非绝对必要，否则避免对 [width](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/lib/devices.ts#L28-L28), [height](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/lib/devices.ts#L29-L29), `padding`, `margin`, `top/left` 进行动画处理。
+- 将成组元素的进入错开 30–80ms 以创建级联揭示效果，而不是一堵运动墙。
+- 刻意操作的不对称计时：按住确认在按下时应缓慢且线性（例如 2s linear），但释放/取消应快速弹回（~200ms ease-out）。
+- 尊重 `prefers-reduced-motion`：通过 `@media (prefers-reduced-motion: no-preference)` 限制非必要的动效。
+
+---
+
+## 预建组件
+
+在实现 UI 功能之前，检查这些组件是否已存在：
+
+地图：
+
+- [client/src/components/Map.tsx](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/components/Map.tsx) - 带有代理身份验证的 Google Maps 集成。提供带有 onMapReady 回调的 MapView 组件，用于初始化 Google Maps 服务（Places, Geocoder, Directions, Drawing 等）。所有地图功能直接在浏览器中工作。
+
+当实现匹配这些类别的功能时，必须先评估组件以决定是使用还是自定义它。
+
+---
+
+## 🗺️ 地图集成
+
+**关键：Manus 代理提供对所有 Google Maps 功能的完全访问权限** - 包括高级绘图、热力图、街景、所有图层、Places API 等。不要向用户询问 Google Map API 密钥 - 身份验证是自动的。
+
+**实现：**
+
+- 前端：从 [client/src/components/Map.tsx](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/components/Map.tsx) 导入 MapView 并在 onMapReady 回调中初始化任何 Google Maps 服务（地理编码、方向、地点、绘图、可视化、几何等）。所有 Google Maps JavaScript API 功能直接在浏览器中工作。
+
+永远不要使用外部地图库或向用户请求 API 密钥 - Manus 代理自动处理一切，没有功能限制。
+
+---
+
+## ✅ 发布检查清单
+
+- [ ] UI 布局和导航结构正确，所有图片 src 有效。
+- [ ] 在浏览器中验证成功 + 错误路径
+
+---
+
+## 核心文件参考
+
+[package.json](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/package.json)
+
 ```tsx
 {
   "name": "fire_alarm_viewer",
@@ -240,6 +252,7 @@ NEVER use external map libraries or request API keys from users - the Manus prox
 ```
 
 `client/src/App.tsx`
+
 ```tsx
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -249,22 +262,21 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 
-
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      {/* 最终 fallback 路由 */}
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+// 注意：关于主题
+// - 首先根据你的设计风格选择一个默认主题（深色或浅色背景），然后在 index.css 中更改调色板
+//   以保持跨组件的前景色/背景色一致
+// - 如果你想让主题可切换，传递 [switchable](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/contexts/ThemeContext.tsx#L7-L7) 给 ThemeProvider 并使用 [useTheme](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/src/contexts/ThemeContext.tsx#L57-L63) hook
 
 function App() {
   return (
@@ -286,28 +298,29 @@ export default App;
 ```
 
 `client/src/pages/Home.tsx`
+
 ```tsx
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { Streamdown } from "streamdown";
 
 /**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
+ * 此页面中的所有內容僅為示例，請替换为你自己的功能实现
+ * 在构建页面时，请记住前端最佳实践、设计指南和常见陷阱中的指示
  */
 export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
+  // 如果 App.tsx 中的主题是可切换的，我们可以像这样实现主题切换：
   // const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen flex flex-col">
       <main>
-        {/* Example: lucide-react for icons */}
+        {/* 示例：lucide-react 用于图标 */}
         <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
+        示例页面
+        {/* 示例：Streamdown 用于 markdown 渲染 */}
+        <Streamdown>任何 **markdown** 内容</Streamdown>
+        <Button variant="default">示例按钮</Button>
       </main>
     </div>
   );
@@ -315,6 +328,7 @@ export default function Home() {
 ```
 
 `client/src/index.css`
+
 ```tsx
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -453,23 +467,23 @@ export default function Home() {
 
 @layer components {
   /**
-   * Custom container utility that centers content and adds responsive padding.
+   * 自定义容器工具类，使内容居中并添加响应式内边距。
    *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
+   * 这覆盖了 Tailwind 默认的容器行为以：
+   * - 自动居中内容 (mx-auto)
+   * - 添加响应式水平内边距
+   * - 为大屏幕设置最大宽度
    *
-   * Usage: <div className="container">...</div>
+   * 用法: <div className="container">...</div>
    *
-   * For custom widths, use max-w-* utilities directly:
+   * 对于自定义宽度，直接使用 max-w-* 工具类:
    * <div className="max-w-6xl mx-auto px-4">...</div>
    */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem; /* 16px - 移动端内边距 */
     padding-right: 1rem;
   }
 
@@ -480,22 +494,23 @@ export default function Home() {
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem; /* 24px - 平板端内边距 */
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem; /* 32px - 桌面端内边距 */
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px; /* 标准内容宽度 */
     }
   }
 }
 ```
 
-`client/index.html`
+[client/index.html](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/client/index.html)
+
 ```tsx
 <!doctype html>
 <html lang="en">
@@ -505,12 +520,12 @@ export default function Home() {
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>{{project_title}}</title>    
-    <!-- THIS IS THE START OF A COMMENT BLOCK, BLOCK TO BE DELETED: Google Fonts here, example:
+    <title>{{project_title}}</title>
+    <!-- 这是注释块的开始，需删除的块：在此处添加 Google Fonts，例如：
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    THIS IS THE END OF A COMMENT BLOCK, BLOCK TO BE DELETED -->
+    这是注释块的结束，需删除的块 -->
   </head>
 
   <body>
@@ -525,7 +540,8 @@ export default function Home() {
 </html>
 ```
 
-`server/index.ts`
+[server/index.ts](file:///Users/jackqiaosan/Desktop/test/fire_alarm_viewer/server/index.ts)
+
 ```tsx
 import express from "express";
 import { createServer } from "http";
@@ -539,7 +555,7 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Serve static files from dist/public in production
+  // 在生产环境中从 dist/public 提供静态文件
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
@@ -547,7 +563,7 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
-  // Handle client-side routing - serve index.html for all routes
+  // 处理客户端路由 - 为所有路由提供 index.html
   app.get("*", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
@@ -561,78 +577,87 @@ async function startServer() {
 
 startServer().catch(console.error);
 ```
+
 ---
 
-## Common Pitfalls
+## 常见陷阱
 
-### Infinite loading loops from unstable references
-**Anti-pattern:** Creating new objects/arrays in render that are used as query inputs
+### 由不稳定引用导致的无限加载循环
+
+**反模式：** 在渲染中创建新的对象/数组并用作查询输入
+
 ```tsx
-// ❌ Bad: New Date() creates new reference every render → infinite queries
+// ❌ 错误：每次渲染都创建新的 Date() → 无限查询
 const { data } = trpc.items.getByDate.useQuery({
-  date: new Date(), // ← New object every render!
+  date: new Date(), // ← 每次渲染都是新对象！
 });
 
-// ❌ Bad: Array/object literals in query input
+// ❌ 错误：查询输入中的数组/对象字面量
 const { data } = trpc.items.getByIds.useQuery({
-  ids: [1, 2, 3], // ← New array reference every render!
+  ids: [1, 2, 3], // ← 每次渲染都是新数组引用！
 });
 ```
 
-**Correct approach:** Stabilize references with useState/useMemo
+**正确方法：** 使用 useState/useMemo 稳定引用
+
 ```tsx
-// ✅ Good: Initialize once with useState
+// ✅ 良好：使用 useState 初始化一次
 const [date] = useState(() => new Date());
 const { data } = trpc.items.getByDate.useQuery({ date });
 
-// ✅ Good: Memoize complex inputs
+// ✅ 良好：记忆复杂输入
 const ids = useMemo(() => [1, 2, 3], []);
 const { data } = trpc.items.getByIds.useQuery({ ids });
 ```
 
-**Why this happens:** TRPC queries trigger when input references change. Objects/arrays created in render have new references each time, causing infinite re-fetches.
+**原因：** TRPC 查询在输入引用更改时触发。在渲染中创建的对象/数组每次都有新引用，导致无限重新获取。
 
-### Navigation dead-ends in subpages
-**Problem:** Creating nested routes without escape routes—no header nav, no sidebar, no back button.
+### 子页面中的导航死胡同
 
-**Root cause:** Implementing individual pages before establishing global layout structure.
+**问题：** 创建嵌套路由而没有退出路径——没有头部导航、没有侧边栏、没有返回按钮。
 
-**Solution:** Define layout wrapper in App.tsx first, then build pages inside it. For admin tools use DashboardLayout; for detail pages add back button with `router.back()`.
+**根本原因：** 在建立全局布局结构之前先实现单个页面。
 
-### Invisible text from theme/color mismatches
+**解决方案：** 首先在 App.tsx 中定义布局包装器，然后在其中构建页面。对于管理工具使用 DashboardLayout；对于详情页面添加带有 `router.back()` 的返回按钮。
 
-**Root cause:** Semantic colors (`bg-background`, `text-foreground`) are CSS variables that resolve based on ThemeProvider's active theme. Mismatches cause invisible text.
+### 由于主题/颜色不匹配导致的不可见文本
 
-**Two critical rules:**
+**根本原因：** 语义颜色（`bg-background`, `text-foreground`）是 CSS 变量，根据 ThemeProvider 的活动主题解析。不匹配会导致文本不可见。
 
-1. **Match theme to CSS variables:** If `defaultTheme="dark"` in App.tsx, ensure `.dark {}` in index.css has dark background + light foreground values
-2. **Always pair bg with text:** When using `bg-{semantic}`, MUST also use `text-{semantic}-foreground` (not automatic - text inherits from parent otherwise)
+**两条关键规则：**
 
-**Quick reference:**
+1. **主题与 CSS 变量匹配：** 如果 App.tsx 中 `defaultTheme="dark"`，确保 index.css 中的 `.dark {}` 具有深色背景 + 浅色前景值
+2. **始终将 bg 与 text 配对：** 使用 `bg-{semantic}` 时，必须也使用 `text-{semantic}-foreground`（不是自动的 - 否则文本从父级继承）
+
+**快速参考：**
+
 ```tsx
-// ✅ Theme + CSS alignment
-<ThemeProvider defaultTheme="dark">  {/* Must match .dark in index.css */}
+// ✅ 主题 + CSS 对齐
+<ThemeProvider defaultTheme="dark">  {/* 必须匹配 index.css 中的 .dark */}
   <div className="bg-background text-foreground">...</div>
 </ThemeProvider>
 
-// ✅ Required class pairs
+// ✅ 必需的类配对
 <div className="bg-popover text-popover-foreground">...</div>
 <div className="bg-card text-card-foreground">...</div>
 <div className="bg-accent text-accent-foreground">...</div>
 ```
 
-### Nested anchor tags in Link components
-**Problem:** Wrapping `<a>` tags inside another `<a>` or wouter's `<Link>` creates nested anchors and runtime errors.
+### Link 组件中的嵌套锚标签
 
-**Solution:** Pass children directly to Link—it already renders an `<a>` internally.
+**问题：** 在另一个 `<a>` 或 wouter 的 `<Link>` 内部包裹 `<a>` 标签会创建嵌套锚点并导致运行时错误。
+
+**解决方案：** 直接将子元素传递给 Link——它内部已经渲染了一个 `<a>`。
+
 ```tsx
-// ❌ Bad: <Link><a>...</a></Link> or <a><a>...</a></a>
-// ✅ Good: <Link>...</Link> or just <a>...</a>
+// ❌ 错误： <Link><a>...</a></Link> 或 <a><a>...</a></a>
+// ✅ 良好： <Link>...</Link> 或 just <a>...</a>
 ```
-### Empty `Select.Item` values
 
-**Rule:** Every `<Select.Item>` must have a non-empty `value` prop—never `""`, `undefined`, or omitted.
+### 空的 `Select.Item` 值
 
-**Rule:** Use sonner for toasts; do not add react-toastify or @radix-ui/react-toast
+**规则：** 每个 `<Select.Item>` 必须有一个非空的 `value` 属性——永远不要是 `""`, `undefined` 或省略。
 
-**Rule:** If you put placeholder components for App.tsx routes, you MUST replace them with actual components after your implementation.
+**规则：** 使用 sonner 进行 toast 通知；不要添加 react-toastify 或 @radix-ui/react-toast
+
+**规则：** 如果你为 App.tsx 路由放置了占位符组件，在实现后必须用实际组件替换它们。

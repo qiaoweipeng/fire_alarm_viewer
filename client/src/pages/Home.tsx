@@ -9,14 +9,6 @@ import { Eye, EyeOff, Search, X, Edit3, Check, Maximize2, Minimize2 } from "luci
 
 /**
  * 火灾报警设备交互查看器
- * 
- * 功能：
- * 1. 显隐切换：通过按钮控制所有设备名称的显示/隐藏 （默认隐藏）
- * 2. 悬停高亮：在隐藏状态下，鼠标悬停在设备上会高亮显示该设备和名称
- * 3. 搜索定位：在搜索框输入完整设备名称，会高亮显示匹配的设备
- * 4. 编辑模式：直接在图片上框选设备，自动生成坐标数据
- * 5. 全屏模式：支持全屏显示
- * 6. 联动交互：左右两侧设备列表和图片联动交互
  */
 export default function Home() {
   const [namesVisible, setNamesVisible] = useState(false); // 默认隐藏名称
@@ -25,9 +17,13 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<Device[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // 选中状态：点击右侧设备后锁定，直到点击叉号清除
   const [selectedDeviceIdFromImage, setSelectedDeviceIdFromImage] = useState<string | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const deviceListRef = useRef<HTMLDivElement>(null);
+
   const {
     selectionBox,
     handleMouseDown,
@@ -52,21 +48,34 @@ export default function Home() {
     setSearchResults([]);
   };
 
-  // 处理任意交互时清空搜索
-  const handleInteraction = () => {
-    if (searchQuery) {
-      handleClearSearch();
+  // 清除选中状态（点击叉号时调用）
+  const handleClearSelection = () => {
+    setSelectedDeviceIdFromImage(null);
+  };
+
+  // 全屏切换
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {
+        setIsFullscreen(true);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {
+        setIsFullscreen(false);
+      });
+      setIsFullscreen(false);
     }
   };
 
-  // 当从图片中点击设备时，滚动左侧列表到该设备
+  // 当从图片中点击设备时，滚动左侧列表到该设备并锁定选中
   const scrollToDevice = (deviceId: string) => {
     if (!deviceListRef.current) return;
-    
+
     const deviceElement = deviceListRef.current.querySelector(
       `[data-device-id="${deviceId}"]`
     ) as HTMLElement;
-    
+
     if (deviceElement) {
       deviceElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
@@ -74,52 +83,34 @@ export default function Home() {
 
   // 处理图片中的设备点击
   const handleDeviceClickFromImage = (deviceId: string) => {
-    handleInteraction();
     setSelectedDeviceIdFromImage(deviceId);
     scrollToDevice(deviceId);
   };
 
-  // 判断设备是否应该高亮
+  // 判断设备是否应该高亮 (右侧图片用)
   const isDeviceHighlighted = (deviceId: string): boolean => {
-    // 搜索结果只在搜索框有内容时高亮
     const isSearchHighlighted = !!searchQuery && searchResults.some((device) => device.id === deviceId);
-    
-    // 如果搜索结果多于1个，不进行联动高亮
-    const shouldSearchHighlight = !!searchQuery && searchResults.length === 1 && isSearchHighlighted;
-    
     return (
       hoveredDeviceId === deviceId ||
       selectedDeviceIdFromImage === deviceId ||
-      !!shouldSearchHighlight
+      isSearchHighlighted
     );
   };
 
   // 判断左侧列表中的设备是否应该高亮
   const isDeviceHighlightedInList = (deviceId: string): boolean => {
+    // 左侧高亮逻辑：悬停 OR 选中 OR 搜索结果
     return (
       hoveredDeviceId === deviceId ||
       selectedDeviceIdFromImage === deviceId ||
-      (!!searchQuery && searchResults.length === 1 && searchResults.some((d) => d.id === deviceId))
+      (!!searchQuery && searchResults.some((d) => d.id === deviceId))
     );
   };
 
-  // 全屏切换
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {
-        // 忽略错误
-      });
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch(() => {
-        // 忽略错误
-      });
-      setIsFullscreen(false);
-    }
-  };
 
-  const mainContent = (
-    <>
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       {/* 顶部控制栏 */}
       <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-700 shadow-lg">
         <div className="max-w-full mx-auto px-4 py-4">
@@ -127,10 +118,10 @@ export default function Home() {
             {/* 标题 */}
             <div>
               <h1 className="text-2xl font-bold text-white">
-                看板设备图（监控考区）
+                看板设备图（东莞监控考区）
               </h1>
               <p className="text-sm text-slate-400 mt-1">
-                2026年05月19日-乔伟鹏
+                design | code by 乔伟鹏 (6/19 2026)
               </p>
             </div>
 
@@ -139,7 +130,7 @@ export default function Home() {
               <Button
                 onClick={toggleFullscreen}
                 variant="outline"
-                className="gap-2"
+                className="gap-2 bg-sky-600 hover:bg-sky-700 border-sky-600"
               >
                 {isFullscreen ? (
                   <>
@@ -153,6 +144,7 @@ export default function Home() {
                   </>
                 )}
               </Button>
+
               <Button
                 onClick={() => setNamesVisible(!namesVisible)}
                 variant={namesVisible ? "default" : "outline"}
@@ -170,6 +162,7 @@ export default function Home() {
                   </>
                 )}
               </Button>
+
               <Button
                 onClick={() => {
                   setEditMode(!editMode);
@@ -218,15 +211,14 @@ export default function Home() {
 
           {/* 搜索结果提示 */}
           {searchQuery && (
-            <div className="mt-2 text-sm text-slate-300">
+            <div className="mt-2 text-sm text-slate-300 min-h-[20px]">
               {searchResults.length > 0 ? (
-                <span>
-                  找到 {searchResults.length} 个设备：
-                  {searchResults.map((d) => d.name).join("、")}
+                <span className="text-green-400">
+                  找到 {searchResults.length} 个设备
                 </span>
               ) : (
-                <span className="text-slate-500">
-                  未找到匹配的设备，请检查输入
+                <span className="text-red-400">
+                  未找到匹配的设备
                 </span>
               )}
             </div>
@@ -237,46 +229,79 @@ export default function Home() {
       {/* 主内容区域 - 使用 flex 布局 */}
       <div className="flex flex-1 gap-4 p-4 overflow-hidden">
         {/* 左侧设备列表面板 */}
-        <div className="w-72 flex-shrink-0 flex flex-col">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 shadow-lg flex flex-col h-full">
+        <div className="w-72 flex-shrink-0 flex flex-col h-180">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 shadow-lg flex flex-col">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-white font-semibold text-sm">
-                设备列表 ({devices.length})
+                设备列表 ({searchQuery ? searchResults.length : devices.length})
               </h3>
             </div>
 
             {/* 设备列表滚动区域 */}
             <div className="flex-1 overflow-y-auto space-y-2 min-h-0" ref={deviceListRef}>
-              {devices.length === 0 ? (
-                <p className="text-slate-400 text-sm text-center py-8">
-                  暂无设备
-                </p>
-              ) : (
-                devices.map((device) => (
-                  <div
-                    key={device.id}
-                    data-device-id={device.id}
-                    onMouseEnter={() => {
-                      handleInteraction();
-                      setHoveredDeviceId(device.id);
-                    }}
-                    onMouseLeave={() => setHoveredDeviceId(null)}
-                    className={`w-full text-left px-3 py-2 rounded text-sm font-medium transition-all ${
-                      isDeviceHighlightedInList(device.id)
-                        ? "bg-yellow-500/30 text-yellow-100 border border-yellow-400"
-                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                    }`}
-                  >
-                    <div className="truncate font-medium">{device.name}</div>
-                  </div>
-                ))
-              )}
+              {(() => {
+                const displayDevices = searchQuery ? searchResults : devices;
+
+                if (displayDevices.length === 0) {
+                  return (
+                    <p className="text-slate-400 text-sm text-center py-8">
+                      {searchQuery ? "无匹配设备" : "暂无设备"}
+                    </p>
+                  );
+                }
+
+                return displayDevices.map((device) => {
+                  const isHighlighted = isDeviceHighlightedInList(device.id);
+                  const isSelected = selectedDeviceIdFromImage === device.id;
+                  const isHovered = hoveredDeviceId === device.id;
+
+                  // 动态样式类
+                  let itemClass = "w-full text-left px-3 py-2 rounded text-sm font-medium transition-all cursor-default select-none flex items-center justify-between ";
+
+                  if (isSelected) {
+                    // 选中状态：深橙色背景，红色边框，呼吸动画
+                    itemClass += "bg-orange-600/40 text-orange-100 border-2 border-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+                  } else if (isHighlighted) {
+                    // 悬停或搜索高亮：浅黄色背景
+                    itemClass += "bg-yellow-500/30 text-yellow-100 border border-yellow-400";
+                  } else {
+                    // 默认状态
+                    itemClass += "bg-slate-700 text-slate-300 hover:bg-slate-600";
+                  }
+
+                  return (
+                    <div
+                      key={device.id}
+                      data-device-id={device.id}
+                      onMouseEnter={() => setHoveredDeviceId(device.id)}
+                      onMouseLeave={() => setHoveredDeviceId(null)}
+                      className={itemClass}
+                    >
+                      <div className="truncate font-medium">{device.name}</div>
+
+                      {/* 只有当该项被选中（来自右侧点击）时，才显示叉号 */}
+                      {isSelected && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleClearSelection();
+                          }}
+                          className="ml-2 p-0.5 hover:bg-red-500/50 rounded text-red-200 hover:text-white transition-colors"
+                          title="取消选中"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
 
         {/* 右侧图片容器 */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-full">
           {editMode && (
             <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-sm text-amber-800">
@@ -287,19 +312,31 @@ export default function Home() {
 
           <div
             ref={containerRef}
-            className={`relative flex-1 bg-slate-800 rounded-lg overflow-hidden shadow-2xl border flex items-center justify-center ${
-              editMode ? "border-amber-500" : "border-slate-700"
-            } ${editMode ? "cursor-crosshair" : "cursor-default"}`}
+            // 关键修改：设置固定尺寸，防止缩放
+            // 注意：这里的 w-[1200px] h-[800px] 是示例，请根据你图片的实际最佳显示尺寸调整
+            // 如果希望完全保持图片原始比例且不缩放，可以使用图片原始像素尺寸
+            className={`relative bg-slate-800 rounded-lg overflow-hidden shadow-2xl border flex items-center justify-center shrink-0 ${editMode ? "border-amber-500 cursor-crosshair" : "border-slate-700 cursor-default"
+              }`}
+            style={{
+              width: '1135px', // 【重要】设置为固定宽度，例如图片原始宽度或你期望的最小宽度
+              height: '713px', // 【重要】设置为固定高度
+            }}
             onMouseDown={editMode ? handleMouseDown : undefined}
             onMouseMove={editMode ? handleMouseMove : undefined}
             onMouseUp={editMode ? handleMouseUp : undefined}
-            onMouseLeave={editMode ? handleMouseUp : undefined}
+            onMouseLeave={(e) => {
+              if (!editMode) {
+                setHoveredDeviceId(null);
+              } else {
+                handleMouseUp();
+              }
+            }}
           >
             {/* 背景图片 */}
             <img
               src="/images/ZhanBan.png"
               alt="火灾报警控制器展示板"
-              className="max-w-full max-h-full object-contain pointer-events-none"
+              className="w-full h-full object-contain pointer-events-none select-none"
               draggable={false}
             />
 
@@ -309,44 +346,29 @@ export default function Home() {
             {/* 设备标签层 */}
             <div className={`absolute inset-0 ${editMode ? "pointer-events-none" : ""}`}>
               {!editMode &&
-                devices.map((device) => (
-                  <DeviceLabel
-                    key={device.id}
-                    device={device}
-                    isVisible={namesVisible}
-                    isHighlighted={isDeviceHighlighted(device.id)}
-                    onHover={(id) => {
-                      handleInteraction();
-                      setHoveredDeviceId(id);
-                    }}
-                    onClick={() => handleDeviceClickFromImage(device.id)}
-                  />
-                ))}
+                devices.map((device) => {
+                  const isSelected = selectedDeviceIdFromImage === device.id;
+                  return (
+                    <DeviceLabel
+                      key={device.id}
+                      device={device}
+                      isVisible={namesVisible}
+                      isHighlighted={isDeviceHighlighted(device.id)}
+                      isSelected={isSelected} // 传递选中状态
+                      onHover={(id) => {
+                        // 如果处于选中状态，悬停不改变选中态，但依然可以触发左侧列表的悬停联动
+                        setHoveredDeviceId(id);
+                      }}
+                      onClick={() => {
+                        handleDeviceClickFromImage(device.id);
+                      }}
+                    />
+                  );
+                })}
             </div>
           </div>
         </div>
       </div>
-    </>
-  );
-
-  if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-        {mainContent}
-        <Button
-          onClick={toggleFullscreen}
-          className="fixed bottom-4 right-4 z-[10000]"
-        >
-          <Minimize2 className="w-4 h-4 mr-2" />
-          退出全屏
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      {mainContent}
     </div>
   );
 }
