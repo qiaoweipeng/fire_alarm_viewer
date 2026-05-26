@@ -284,14 +284,14 @@ export const devices: Device[] = [
     height: 17,
   }, {
     id: "device_1779189202927",
-    name: "2F-切非模块",
+    name: "2F-切非(脉冲)模块",
     x: 623,
     y: 275,
     width: 24,
     height: 22,
   }, {
     id: "device_1779191291265",
-    name: "2F-切电",
+    name: "2F-脉冲切电",
     x: 621,
     y: 325,
     width: 26,
@@ -355,28 +355,28 @@ export const devices: Device[] = [
     height: 31,
   }, {
     id: "device_1779191979423",
-    name: "线型感温电缆探测器（不可恢复）",
+    name: "线型感温电缆探测器（可恢复）",
     x: 700,
     y: 321,
     width: 74,
     height: 46,
   }, {
     id: "device_1779191175832",
-    name: "感温电缆模块（不可恢复）",
+    name: "感温电缆模块（可恢复）",
     x: 753,
     y: 378,
     width: 23,
     height: 21,
   }, {
     id: "device_1779191965973",
-    name: "线型感温电缆探测器（可恢复）",
+    name: "线型感温电缆探测器（不可恢复）",
     x: 785,
     y: 321,
     width: 75,
     height: 45,
   }, {
     id: "device_1779191162016",
-    name: "感温电缆模块（可恢复）",
+    name: "感温电缆模块（不可恢复）",
     x: 777,
     y: 378,
     width: 22,
@@ -466,7 +466,7 @@ export const devices: Device[] = [
     height: 39,
   }, {
     id: "device_1779194508221",
-    name: "1F-楼梯间-应急疏散标志灯具", // 请修改为实际的设备名称
+    name: "1F-应急疏散标志灯具", // 请修改为实际的设备名称
     x: 510,
     y: 553,
     width: 74,
@@ -615,14 +615,14 @@ export const devices: Device[] = [
     height: 21,
   }, {
     id: "device_1779197211056",
-    name: "1F-切非模块", // 请修改为实际的设备名称
+    name: "1F-切非（脉冲）模块", // 请修改为实际的设备名称
     x: 619,
     y: 457,
     width: 22,
     height: 25,
   }, {
     id: "device_1779197222889",
-    name: "1F-切电", // 请修改为实际的设备名称
+    name: "1F-脉冲切电", // 请修改为实际的设备名称
     x: 618,
     y: 503,
     width: 24,

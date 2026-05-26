@@ -334,7 +334,7 @@ export default function Home() {
           >
             {/* 背景图片 */}
             <img
-              src="/images/ZhanBan.png"
+              src="/images/zhanban2940*1846.jpg"
               alt="火灾报警控制器展示板"
               className="w-full h-full object-contain pointer-events-none select-none"
               draggable={false}
